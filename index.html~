@@ -1,0 +1,32 @@
+<html>
+  <head>
+    	<title>Music XML</title>
+    	<meta name="viewport" content="initial-scale = 1.0, minimum-scale = 1.0, maximum-scale = 1.0, user-scalable = no">
+    	<script src="jquery-1.11.1.min.js"></script>	
+    	<script src="vexflow-debug.js"></script>
+	<script src="jquery.xml2json.js" type="text/javascript" language="javascript"></script> 
+	<script type="text/javascript" src="debugout.js"></script>
+	<script src="java.js" type="text/javascript" charset="utf-8"></script> 
+	<link href="style.css" type="text/css" rel="stylesheet">	
+  </head>
+  <body>
+	<div>
+	  <select id='opt'>
+		<option value="music/bach.xml">Bach</option>
+		<option value="music/ActorPreludeSample.xml">ActorPreludeSample</option>
+		<option value="music/BeetAnGeSample.xml">BeetAnGeSample</option>
+		<option value="music/Binchois.xml">Binchois</option>
+		<option value="music/Dichterliebe01.xml">Dichterliebe</option>
+	  </select>
+	  <button id="id">Open</button>
+	  <input id="yourinputname" type="file" name="yourinputname" style="display: none;" />
+	<form id="testForm">
+		<input type="file" id="fileField" />
+	</form>
+	</div>
+    <div id="viewer">
+      <p>Please enable JavaScript to use the viewer.</p>
+    </div>
+  </body>
+</html>
+

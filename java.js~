@@ -1,0 +1,179 @@
+// source: http://stackoverflow.com/a/901144
+var bugout = new debugout();
+var sheet;
+var i = 0;
+
+var notes = {};
+notes.step = [];
+notes.octave = [];
+notes.posX = [];
+notes.posY = [];
+notes.measureWidth = [];
+
+var measureIndex=0;
+var noteIndex=0;
+
+var page_height=1;
+var page_width=1;
+var doc = null;
+$(document).ready(function() {
+
+	var req = new XMLHttpRequest();
+	var uri = getParameter('doc');
+
+	drawPage(req,uri);
+	
+
+	$('#opt').change(function() {
+		uri = $('#opt option:selected').val();
+		drawPage(req,uri);
+	});
+
+	
+	$('#id').click(function() {
+		$('#yourinputname').trigger('click');
+	});
+
+	$('#fileField').change(function() {
+		filenameIn = $(this).val();
+		filenameOut = filenameIn.split('\\').pop();
+		//alert("filenameIn : "+filenameIn+" filenameOut : "+filenameOut);
+	});
+	$('#redStuffButton').click(function() {
+		//drawRedThing();
+		drawBottomNotesArray();
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-35593052-1']);		// No idea what this shit is for...
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	});
+});
+
+function posNote(){
+	var margin = 8;
+	var clef = 25;
+	var gamme = 20;
+	var noteWidth =20;
+	var endOfMeasure = 20;
+	var startOfMeasure = 12;
+	var YfirstMeasure =40;
+	var YMeasures =82;
+}
+
+function drawRedThing(){
+	$( "#viewer" ).append( "<div id=\"red\"></div>" );
+	console.log(notes.measureWidth[9]+" : "+notes.posX[17]);
+	var posX = parseInt(notes.measureWidth[0])+parseInt(notes.measureWidth[9])-75+(parseInt(notes.posX[17]/1.2));
+	console.log(posX);
+	$("#red").css({
+		"background-color":"red",
+		"opacity":"0.5",
+		"display":"block",
+		"width":"10px",
+		"height":"50px",
+		"z-index":"3",
+		"position":"absolute",
+		"left": (8+25+20+20+20+20+20+20+20+20+20+20+12+20+20+20+20+20+20+20)+"px",
+		"top": (40+82+82+82)+"px"
+	});
+}
+
+function drawBottomNotesArray(){
+	$("body").append("<div id=\"beauTom\"></div>" );
+	$("#beauTom").css({
+		"background-color":"white",
+		"display":"block",
+		"width":"95%",
+		"height":"120px",
+		"z-index":"3",
+		"position":"fixed",
+		"bottom": "2px",
+		"border-radius" : "60px 60px 60px 60px",
+ 		"border" : "8px solid black"
+	});
+	$.each( notes.step, function( key, value ) {
+		console.log(key+" "+value);
+		$('#beauTom').append(value);
+	});
+}
+
+function getParameter(name) {
+	name = name.replace(/\[]/, "\\\[").replace(/[\]]/, "\\\]");
+	var regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
+	var results = regex.exec(window.location.search);
+	if (results == null) return undefined;
+	else return decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+function drawPage(req,uri) {
+	if (! uri) uri = $('#opt option:selected').val();
+	req.open('GET', uri, true);
+	req.onreadystatechange = function() {
+		if (req.readyState != 4) return;
+		doc = new Vex.Flow.Document(req.responseText);
+		doc.getFormatter().setWidth(800).draw($("#viewer")[0]);
+	};
+	req.send(null);
+	$('.dynamic_lbl').css('display','none');				// Efface les labels dynamiques
+	parseShit();
+	showCredits();
+	getNotes();
+}
+
+function parseShit() {
+	$.ajax({
+		type: "GET",
+		url: $('#opt option:selected').val(),
+		datatype: "xml",
+		async: false,
+		success: function(xml) {
+			sheet = $.xml2json(xml); 
+		}
+	});
+}
+
+function showCredits() {
+	page_height = sheet.defaults.page_layout.page_height;
+	page_width = sheet.defaults.page_layout.page_width;
+	$.each(sheet.credit, function(index, element) {			// We dont know how many labels there is : vary from sheet to sheet.
+		i++;							// Used to generate dynamic id's
+		var label = $("<label class='dynamic_lbl'>");		// To erase labels when switching music
+		label.prop("id","lbl_"+i)				// Add an ID 
+		label.append(element.credit_words.text);		// We fill the label with the content of the "credit_words" (usually the title and such)
+		$('body').append(label);				// Insert the label in the page
+		label.css({						
+			bottom: ($( window ).height()/page_height)*element.credit_words.default_y, 
+			left: ($( window ).width()/page_width)*element.credit_words.default_x, 
+			position:'absolute'});
+		label.css('font-size',element.credit_words.font_size);	// Change the font size (specified in the musicXML document)
+	});
+}
+
+function getNotes(){
+	
+	$.each(sheet.part.measure, function(index, element) {	
+		//console.log(element);
+		var a = 0;
+		for ( var i = 0; i < element.note.length; i++ ) {
+			//console.log(element.note[i]);
+			if(element.note[i].pitch){ 
+				//var lbl=index+"_"+a;
+				notes.step.push(element.note[i].pitch.step);
+				notes.octave.push(element.note[i].pitch.octave);
+				notes.posX.push(element.note[i].default_x);
+				notes.posY.push(element.note[i].default_y);
+				notes.measureWidth.push(element.width);
+				//a++;
+			}
+		}
+	});
+	//console.log(notes);
+}
+
+
+

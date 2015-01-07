@@ -1,0 +1,63 @@
+<html>
+  <head>
+    	<title>Music XML</title>
+    	<meta name="viewport" content="initial-scale = 1.0, minimum-scale = 1.0, maximum-scale = 1.0, user-scalable = no">
+    	<script src="jquery-1.11.1.min.js"></script>	
+	<script src="vexflow-debug.js"></script>
+	<script src="jquery.xml2json.js" type="text/javascript" language="javascript"></script> 
+	<script type="text/javascript" src="debugout.js"></script>
+	<script src="java.js" type="text/javascript" charset="utf-8"></script>
+	<script src="pitchdetect.js"></script> 
+	<link href="style.css" type="text/css" rel="stylesheet">	
+  </head>
+  <body>
+	<div>
+		<?php
+			$dir    = 'music';
+			$files1 = scandir($dir);
+			$files2 = scandir($dir, 1);
+
+			print_r($files1);
+			print_r($files2);
+		?>
+	  	<select id='opt'>
+			<option value="music/f_XMas.xml">Joy to the World</option>
+			<option value="music/f_DiaryofJane.xml">Diary of Jane</option>
+			<option value="music/JesuJoyOfMan.xml">Jesu Joy of Man</option>
+			<option value="music/IJustCall.xml">I Just Call</option>
+			<option value="music/TheGreatGuardian.xml">The Great Guardian</option>
+	  	</select>
+	 	<button id="id">Open</button>
+		<input id="yourinputname" type="file" name="yourinputname" style="display: none;" />
+		<form id="testForm">
+			<input type="file" id="fileField" />
+		</form>
+		<button id="redStuffButton" onclick="toggleLiveInput()">Start</button>
+	</div>
+	<div id="beauTom" style="display:none;">
+		<div class="bottomNote" id="n1"></div>
+		<div class="bottomNote" id="n2"></div>
+		<div class="bottomNote" id="n3"></div>
+		<div class="bottomNote" id="n4"></div>
+		<div class="bottomNote" id="n5"></div>
+		<div class="bottomNote" id="n6"></div>
+		<div class="bottomNote" id="n7"></div>
+		<div class="bottomNote" id="n8"></div>
+		<div class="bottomNote" id="n9"></div>
+		<div class="bottomNote" id="n10"></div>
+	</div>
+	<div id="hertzThing">
+		<div id="detector" class="vague">
+		<div class="pitch"><span id="pitch">--</span>Hz</div>
+		<div class="note"><span id="note">--</span></div>   
+		<canvas id="output" width=300 height=42></canvas>
+		<div id="detune"><span id="detune_amt">--</span><span id="flat">cents &#9837;</span><span id="sharp">cents &#9839;</span></div>
+		</div>
+	</div>
+	<div class="square"></div>
+	<div id="viewer">
+		<p>Please enable JavaScript to use the viewer.</p>
+	</div>
+  </body>
+</html>
+

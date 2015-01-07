@@ -1,0 +1,75 @@
+<html>
+<head>
+  <title>PHP File Browser</title>
+  <style type="text/css">
+    .error{ color:red; font-weight:bold; }
+    .unlink{ margin-left:1em; font-size:small; color:red;}
+  </style>
+</head>
+<body>
+  <h1>Directory Browser</h1>
+<?php
+  // Explore the files via a web interface.
+  $script = basename(__FILE__); // the name of this script
+  $path   = !empty($_REQUEST['path']) ? $_REQUEST['path'] : dirname(__FILE__); // the path the script should access
+  $unlink = $_REQUEST['unlink'];
+
+  if(!empty($unlink)){
+    $unlink = realpath("$path/$unlink");
+    if(is_writable($unlink) && !unlink($unlink)){
+      echo "<div class=\"error\">Unable to delete file: $unlink</div>";
+    }
+  }
+
+  echo "<p>Browsing Location: {$path}</p>";
+
+  $directories = array();
+  $files       = array();
+
+  // Check we are focused on a dir
+  if (is_dir($path)){
+    chdir($path); // Focus on the dir
+    if ($handle = opendir('.')){
+      while (($item = readdir($handle)) !== false) {
+        // Loop through current directory and divide files and directorys
+        if(is_dir($item)){
+          array_push($directories, realpath($item));
+        }
+        else{
+          array_push($files, ($item));
+        }
+      }
+
+      closedir($handle); // Close the directory handle
+    }
+    else {
+      echo "<p class=\"error\">Directory handle could not be obtained.</p>";
+    }
+  }
+  else{
+    echo "<p class=\"error\">Path is not a directory</p>";
+  }
+
+  // List the directories as browsable navigation
+  echo "<h2>Navigation</h2>";
+  echo "<ul>";
+  foreach($directories as $directory){
+    echo ($directory != $path) ? "<li><a href=\"{$script}?path={$directory}\">{$directory}</a></li>" : "";
+  }
+  echo "</ul>";
+
+  echo "<h2>Files</h2>";
+  echo "<ul>";
+  foreach($files as $file){
+    // Comment the next line out if you wish see hidden files while browsing
+    if(preg_match("/^\./", $file) || $file == $script){continue;} // This line will hide all invisible files.
+
+    $delete = is_writable($file) ? "<a class=\"unlink\" href=\"{$script}?path={$path}&unlink={$file}\">delete</a>" : '';
+
+    echo '<li><a href="' . basename($file) . '" target="_blank">' . $file . "</a> $delete</li>";
+  }
+  echo "</ul>";
+?>
+
+</body>
+</html>
